@@ -1,13 +1,19 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
 
 public class LinkAlgorithm
 {
     List<List<GameObject>> blockMatrix;
     int maxX;  // x can't reach maxX.
     int maxY;  // y can't reach maxY.
+    Vector3Int[] neighborDirections = {
+        Vector3Int.up,
+        Vector3Int.right,
+        Vector3Int.down,
+        Vector3Int.left
+    };
 
     public void Initialize(List<List<GameObject>> blockMatrix, int maxX, int maxY)
     {
@@ -22,16 +28,6 @@ public class LinkAlgorithm
         Vector3Int rightPosition = right.GetComponent<Block>().getLogicalPosition();
 
         List<Vector3Int> turns = new List<Vector3Int>();
-        if (LinkableWithoutTurn(leftPosition, rightPosition))
-        {
-            return turns;
-        }
-
-        if (LinkableWithOneTurn(turns, leftPosition, rightPosition))
-        {
-            return turns;
-        }
-
         if (LinkableWithTwoTurns(turns, leftPosition, rightPosition))
         {
             return turns;
@@ -41,35 +37,35 @@ public class LinkAlgorithm
 
     bool LinkableWithTwoTurns(List<Vector3Int> turns, Vector3Int left, Vector3Int right)
     {
-        // Scan vertically along right.
-        for (int x = -1; x <= maxX; x++)
+        if (LinkableWithOneTurn(turns, left, right))
         {
-            Vector3Int candidateTurn = new Vector3Int(x, right.y, 0);
-            if (!IsMatrixEmtpyAt(candidateTurn))
-            {
-                continue;
-            }
-            if (LinkableWithoutTurn(candidateTurn, right)
-                 && LinkableWithOneTurn(turns, candidateTurn, left))
-            {
-                turns.Add(candidateTurn);
-                return true;
-            }
+            return true;
         }
 
-        // Scan horizontally along right.
-        for (int y = -1; y <= maxY; y++)
+        int maxDistance = Math.Max(
+          Math.Max(right.x, maxX - right.x),
+          Math.Max(right.y, maxY - right.y)
+        );
+        for (int distance = 0; distance < maxDistance; distance++)
         {
-            Vector3Int candidateTurn = new Vector3Int(right.x, y, 0);
-            if (!IsMatrixEmtpyAt(candidateTurn))
+            foreach (var neighborDirection in neighborDirections)
             {
-                continue;
-            }
-            if (LinkableWithoutTurn(candidateTurn, right)
-                && LinkableWithOneTurn(turns, candidateTurn, left))
-            {
-                turns.Add(candidateTurn);
-                return true;
+                Vector3Int candidateTurn = right + distance * neighborDirection;
+                if (candidateTurn.x < -1 || candidateTurn.x > maxX
+                    || candidateTurn.y < -1 || candidateTurn.y > maxY)
+                {
+                    continue;
+                }
+                if (!IsMatrixEmtpyAt(candidateTurn))
+                {
+                    continue;
+                }
+                if (LinkableWithoutTurn(candidateTurn, right)
+                     && LinkableWithOneTurn(turns, candidateTurn, left))
+                {
+                    turns.Add(candidateTurn);
+                    return true;
+                }
             }
         }
 
@@ -78,6 +74,11 @@ public class LinkAlgorithm
 
     bool LinkableWithOneTurn(List<Vector3Int> turns, Vector3Int left, Vector3Int right)
     {
+        if (LinkableWithoutTurn(left, right))
+        {
+            return true;
+        }
+
         Vector3Int candidateTurn1 = new Vector3Int(left.x, right.y, 0);
         if (IsMatrixEmtpyAt(candidateTurn1)
             && LinkableWithoutTurn(left, candidateTurn1)
