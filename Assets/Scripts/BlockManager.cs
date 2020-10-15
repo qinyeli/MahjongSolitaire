@@ -37,8 +37,9 @@ public class BlockManager : MonoBehaviour
 
                 Block block = newBlock.GetComponent<Block>();
                 int blockType = GetBlockType(x, y);
-                block.SetPhysicalPosition(LogicalPositionToPhysicalPosition(x, y))
-                    .SetLogicalPosition(x, y)
+                Vector3Int logicalPosition = new Vector3Int(x, y, 0);
+                block.SetPhysicalPosition(LogicalPositionToPhysicalPosition(logicalPosition))
+                    .SetLogicalPosition(logicalPosition)
                     .SetTypeID(blockType)
                     .SetSprite(blockSprites[blockType]);
             }
@@ -131,15 +132,15 @@ public class BlockManager : MonoBehaviour
         return linkAlgorithm.Linkable(clickedBlock, block);
     }
 
-    Vector3 LogicalPositionToPhysicalPosition(int x, int y)
+    Vector3 LogicalPositionToPhysicalPosition(Vector3Int logicalPosition)
     {
-        return new Vector3(x, y, 0) + blocksCenter;
+        return logicalPosition + blocksCenter;
     }
 
     GameObject MousedOverBlock()
     {
         RaycastHit2D hit = Physics2D.Raycast(
-          Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero);
+          Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector3.zero);
         if (!hit.collider)
         {
             return null;

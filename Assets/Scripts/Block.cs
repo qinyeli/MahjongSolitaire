@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Block : MonoBehaviour
 {
-    (int x, int y) logicalPosition;
+    Vector3Int logicalPosition;
     int blockType;
 
     ///////////////////////////////////////////////////////////////////////////
@@ -28,13 +28,13 @@ public class Block : MonoBehaviour
         return this;
     }
 
-    public Block SetLogicalPosition(int x, int y)
+    public Block SetLogicalPosition(Vector3Int logicalPosition)
     {
-        this.logicalPosition = (x, y);
+        this.logicalPosition = logicalPosition;
         return this;
     }
 
-    public (int x, int y) getLogicalPosition()
+    public Vector3Int getLogicalPosition()
     {
         return logicalPosition;
     }

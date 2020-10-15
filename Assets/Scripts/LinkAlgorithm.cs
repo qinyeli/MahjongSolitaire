@@ -18,10 +18,10 @@ public class LinkAlgorithm
 
     public bool Linkable(GameObject left, GameObject right)
     {
-        (int x, int y) leftPosition = left.GetComponent<Block>().getLogicalPosition();
-        (int x, int y) rightPosition = right.GetComponent<Block>().getLogicalPosition();
+        Vector3Int leftPosition = left.GetComponent<Block>().getLogicalPosition();
+        Vector3Int rightPosition = right.GetComponent<Block>().getLogicalPosition();
 
-        List<(int x, int y)> turns = new List<(int x, int y)>();
+        List<Vector3Int> turns = new List<Vector3Int>();
         if (LinkableWithoutTurn(leftPosition, rightPosition))
         {
             return true;
@@ -39,15 +39,12 @@ public class LinkAlgorithm
         return false;
     }
 
-    bool LinkableWithTwoTurns(
-      List<(int x, int y)> turns,
-      (int x, int y) left,
-      (int x, int y) right)
+    bool LinkableWithTwoTurns(List<Vector3Int> turns, Vector3Int left, Vector3Int right)
     {
         // Scan vertically along left.
         for (int x = -1; x <= maxX; x++)
         {
-            (int x, int y) candidateTurn = (x, left.y);
+            Vector3Int candidateTurn = new Vector3Int(x, left.y, 0);
             if (!IsMatrixEmtpyAt(candidateTurn))
             {
                 continue;
@@ -63,7 +60,7 @@ public class LinkAlgorithm
         // Scan horizontally along left.
         for (int y = -1; y <= maxY; y++)
         {
-            (int x, int y) candidateTurn = (left.x, y);
+            Vector3Int candidateTurn = new Vector3Int(left.x, y, 0);
             if (!IsMatrixEmtpyAt(candidateTurn))
             {
                 continue;
@@ -79,12 +76,9 @@ public class LinkAlgorithm
         return false;
     }
 
-    bool LinkableWithOneTurn(
-      List<(int x, int y)> turns,
-      (int x, int y) left,
-      (int x, int y) right)
+    bool LinkableWithOneTurn( List<Vector3Int> turns, Vector3Int left, Vector3Int right)
     {
-        (int x, int y) candidateTurn1 = (left.x, right.y);
+        Vector3Int candidateTurn1 = new Vector3Int(left.x, right.y, 0);
         if (IsMatrixEmtpyAt(candidateTurn1)
             && LinkableWithoutTurn(left, candidateTurn1)
             && LinkableWithoutTurn(right, candidateTurn1))
@@ -93,7 +87,7 @@ public class LinkAlgorithm
             return true;
         }
 
-        (int x, int y) candidateTurn2 = (right.x, left.y);
+        Vector3Int candidateTurn2 = new Vector3Int(right.x, left.y, 0);
         if (IsMatrixEmtpyAt(candidateTurn2)
             && LinkableWithoutTurn(left, candidateTurn2)
             && LinkableWithoutTurn(right, candidateTurn2))
@@ -105,12 +99,12 @@ public class LinkAlgorithm
         return false;
     }
 
-    bool LinkableWithoutTurn((int x, int y) left, (int x, int y) right)
+    bool LinkableWithoutTurn(Vector3Int left, Vector3Int right)
     {
         return LinkableHorizontally(left, right) || LinkableVertically(left, right);
     }
 
-    bool LinkableHorizontally((int x, int y) left, (int x, int y) right)
+    bool LinkableHorizontally(Vector3Int left, Vector3Int right)
     {
         if (left.y != right.y)
         {
@@ -139,7 +133,7 @@ public class LinkAlgorithm
         return true;
     }
 
-    bool LinkableVertically((int x, int y) left, (int x, int y) right)
+    bool LinkableVertically(Vector3Int left, Vector3Int right)
     {
         if (left.x != right.x)
         {
@@ -168,7 +162,7 @@ public class LinkAlgorithm
         return true;
     }
 
-    bool IsMatrixEmtpyAt((int x, int y) position)
+    bool IsMatrixEmtpyAt(Vector3Int position)
     {
         if (position.x <= -1 || position.x >= maxX)
         {
