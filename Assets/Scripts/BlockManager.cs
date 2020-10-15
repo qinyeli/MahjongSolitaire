@@ -38,7 +38,7 @@ public class BlockManager : MonoBehaviour
                 Block block = newBlock.GetComponent<Block>();
                 int blockType = GetBlockType(x, y);
                 Vector3Int logicalPosition = new Vector3Int(x, y, 0);
-                block.SetPhysicalPosition(LogicalPositionToPhysicalPosition(logicalPosition))
+                block.SetPhysicalPosition(ToPhysicalPosition(logicalPosition))
                     .SetLogicalPosition(logicalPosition)
                     .SetTypeID(blockType)
                     .SetSprite(blockSprites[blockType]);
@@ -54,8 +54,18 @@ public class BlockManager : MonoBehaviour
             GameObject mousedOverBlock = MousedOverBlock();
             if (mousedOverBlock)
             {
-                if (LinkableToClickedBlock(mousedOverBlock))
+                List<Vector3Int> turns = LinkableToClickedBlock(mousedOverBlock);
+                if (turns != null)
                 {
+                    List<Vector3> pointsOnLine = new List<Vector3>();
+                    pointsOnLine.Add(clickedBlock.transform.position);
+                    turns.ForEach((Vector3Int turn) =>
+                    {
+                        pointsOnLine.Add(ToPhysicalPosition(turn));
+                    });
+                    pointsOnLine.Add(mousedOverBlock.transform.position);
+                    LineDrawer.DrawLine(pointsOnLine);
+
                     Destroy(mousedOverBlock);
                     Destroy(clickedBlock);
                 }
@@ -123,16 +133,16 @@ public class BlockManager : MonoBehaviour
         clickedBlock = null;
     }
 
-    bool LinkableToClickedBlock(GameObject block)
+    List<Vector3Int> LinkableToClickedBlock(GameObject block)
     {
         if (!clickedBlock || clickedBlock == block || !Block.IsSameType(clickedBlock, block))
         {
-            return false;
+            return null;
         }
         return linkAlgorithm.Linkable(clickedBlock, block);
     }
 
-    Vector3 LogicalPositionToPhysicalPosition(Vector3Int logicalPosition)
+    Vector3 ToPhysicalPosition(Vector3Int logicalPosition)
     {
         return logicalPosition + blocksCenter;
     }
