@@ -54,9 +54,13 @@ public class BlockManager : MonoBehaviour
             GameObject mousedOverBlock = MousedOverBlock();
             if (mousedOverBlock)
             {
+                AudioPlayer.Instance.PlaySFX(AudioPlayer.SFXName.Click);
+
                 List<Vector3Int> turns = LinkableToClickedBlock(mousedOverBlock);
                 if (turns != null)
                 {
+                    AudioPlayer.Instance.PlaySFX(AudioPlayer.SFXName.Link);
+
                     List<Vector3> pointsOnLine = new List<Vector3>();
                     pointsOnLine.Add(clickedBlock.transform.position);
                     turns.ForEach((Vector3Int turn) =>
