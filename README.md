@@ -1,7 +1,7 @@
 # Mahjong Solitaire (a.k.a 连连看)
 
 Arthor: Qinye Li (qinyeli@umich.edu)  
-Last updated; Oct, 2020
+Last updated: Oct, 2020
 
 ## About
 
