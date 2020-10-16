@@ -59,19 +59,8 @@ public class BlockManager : MonoBehaviour
                 List<Vector3Int> turns = LinkableToClickedBlock(mousedOverBlock);
                 if (turns != null)
                 {
-                    AudioPlayer.Instance.PlaySFX(AudioPlayer.SFXName.Link);
-
-                    List<Vector3> pointsOnLine = new List<Vector3>();
-                    pointsOnLine.Add(clickedBlock.transform.position);
-                    turns.ForEach((Vector3Int turn) =>
-                    {
-                        pointsOnLine.Add(ToPhysicalPosition(turn));
-                    });
-                    pointsOnLine.Add(mousedOverBlock.transform.position);
-                    LineDrawer.DrawLine(pointsOnLine);
-
-                    Destroy(mousedOverBlock);
-                    Destroy(clickedBlock);
+                    StartCoroutine(OnBlocksLinked(turns, clickedBlock, mousedOverBlock));
+                    clickedBlock = null;
                 }
                 else
                 {
@@ -164,5 +153,29 @@ public class BlockManager : MonoBehaviour
             return hit.collider.gameObject;
         }
         return null;
+    }
+
+    IEnumerator OnBlocksLinked(List<Vector3Int> turns, GameObject block1, GameObject block2)
+    {
+        // Sound effect.
+        AudioPlayer.Instance.PlaySFX(AudioPlayer.SFXName.Link);
+
+        // Visual effect.
+        block1.GetComponent<Block>().SetTransparency(0.5f);
+        block2.GetComponent<Block>().SetTransparency(0.5f);
+
+        List<Vector3> pointsOnLine = new List<Vector3>();
+        pointsOnLine.Add(block1.transform.position);
+        turns.ForEach((Vector3Int turn) =>
+        {
+            pointsOnLine.Add(ToPhysicalPosition(turn));
+        });
+        pointsOnLine.Add(block2.transform.position);
+        LineDrawer.DrawLine(pointsOnLine);
+
+        yield return new WaitForSeconds(0.3f);
+        LineDrawer.ClearLine();
+        Destroy(block1);
+        Destroy(block2);
     }
 }
