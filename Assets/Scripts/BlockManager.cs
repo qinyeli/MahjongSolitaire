@@ -157,6 +157,9 @@ public class BlockManager : MonoBehaviour
 
     IEnumerator OnBlocksLinked(List<Vector3Int> turns, GameObject block1, GameObject block2)
     {
+        block1.GetComponent<BoxCollider2D>().enabled=false;
+        block2.GetComponent<BoxCollider2D>().enabled=false;
+
         // Sound effect.
         AudioPlayer.Instance.PlaySFX(AudioPlayer.SFXName.Link);
 
